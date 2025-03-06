@@ -64,7 +64,7 @@ export default function NewEntryTest() {
             const body = {name, artist, genres, release_date, nr_tracks, duration, listened_date, rating, cover_url};
             console.log("Request body:", body);
 
-            const response = await fetch("http://localhost:5000/new-entry", {
+            const response = await fetch("https://the-consoomer.onrender.com/new-entry", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(body)

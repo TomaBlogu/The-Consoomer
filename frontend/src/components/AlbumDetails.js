@@ -10,7 +10,7 @@ export default function AlbumDetails() {
   useEffect(() => {
     const fetchAlbum = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/albums/${id}`);
+        const response = await fetch(`https://the-consoomer.onrender.com/albums/${id}`);
         if (!response.ok) throw new Error("Album not found");
         const data = await response.json();
         setAlbum(data);

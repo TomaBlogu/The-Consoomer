@@ -7,7 +7,7 @@ export default function AlbumList() {
   useEffect(() => {
     const fetchAlbums = async () => {
       try {
-        const response = await fetch("http://localhost:5000/albums");
+        const response = await fetch("https://the-consoomer.onrender.com/albums");
         const data = await response.json();
         setAlbums(data.rows); // Use data.rows since your query returns an object with a "rows" key
       } catch (error) {
