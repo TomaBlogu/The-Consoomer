@@ -58,7 +58,7 @@ export default function Navbar (){
             </ul>
           </div>
           <div className="navbar-end">
-            <a className="btn" href="./new-entry">+ new entry</a>
+            <a className="btn" href="/new-entry">+ new entry</a>
           </div>
         </div>
         </>

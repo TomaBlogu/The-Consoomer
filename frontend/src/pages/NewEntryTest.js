@@ -158,7 +158,7 @@ export default function NewEntryTest() {
             <p>Release date:</p>
             <input
                 className ="input input-bordered w-full max-w-xs"
-                type="text"
+                type="date"
                 value={release_date}
                 onChange={e => setReleaseDate(e.target.value)}>
             </input>
@@ -179,7 +179,7 @@ export default function NewEntryTest() {
             <p>Listened date:</p>
             <input
                 className ="input input-bordered w-full max-w-xs"
-                type="text"
+                type="date"
                 value={listened_date}
                 onChange={e => setListenedDate(e.target.value)}>
             </input>

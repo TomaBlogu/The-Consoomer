@@ -29,20 +29,34 @@ export default function AlbumDetails() {
   if (!album) return <p>No album found.</p>;
 
   return (
-    <div className="flex items-center gap-6">
+    <div className="grid gap-2 grid-cols-1">
+      <div className="text-center block">
+        <p>
+          <b>{album.name}</b> ({new Date(album.release_date).getFullYear()})
+        </p>
+        <p>{album.artist}</p>
+      </div>
       <img
         src={album.cover_url || "https://via.placeholder.com/300"}
         alt={album.name}
-        className="w-60 h-60 object-cover rounded-md"
+        className="object-cover rounded-md"
       />
       <div>
-        <h2 className="text-xl font-bold">{album.name}</h2>
-        <p><strong>Artist:</strong> {album.artist}</p>
         <p><strong>Genres:</strong> {album.genres}</p>
-        <p><strong>Release Date:</strong> {new Intl.DateTimeFormat("en-GB").format(new Date(album.release_date))}</p>
+        <p><strong>Release Date:</strong> {new Date(album.release_date).toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "long",
+          year: "numeric"
+          })}
+        </p>
         <p><strong>Number of Tracks:</strong> {album.nr_tracks}</p>
-        <p><strong>Duration:</strong> {album.duration}</p>
-        <p><strong>Listened Date:</strong> {album.listened_date ? new Intl.DateTimeFormat("en-GB").format(new Date(album.listened_date)) : "Not listened yet"}</p>
+        <p><strong>Duration:</strong> {album.duration} mins</p>
+        <p><strong>Listened Date:</strong> {new Date(album.listened_date).toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "long",
+          year: "numeric"
+          })}
+        </p>
         <p><strong>Rating:</strong> {album.rating}</p>
       </div>
     </div>
