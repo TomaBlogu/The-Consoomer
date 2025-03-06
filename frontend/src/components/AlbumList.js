@@ -44,7 +44,8 @@ export default function AlbumList() {
   // Render the albums grouped by year and month
   return (
     <>
-      <div className="overflow-x-auto mt-10">
+      <p className="text-center text-[25px] mt-5 mb-5"><b>Consumed Albums</b></p>
+      <div className="overflow-x-auto">
         {Object.keys(groupedAlbums).map((groupKey) => (
           <div key={groupKey}>
             <h2 className="text-xl font-bold mt-5 mb-5">{groupKey}</h2>

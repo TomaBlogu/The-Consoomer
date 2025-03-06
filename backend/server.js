@@ -10,9 +10,9 @@ app.use(express.json());
 
 app.post("/new-entry", async (req, res) => {
     try {
-        const { name, artist, genres, release_date, nr_tracks, duration, listened_date, rating, cover_url } = req.body;
-        const newEntry = await pool.query("INSERT INTO album (name, artist, genres, release_date, nr_tracks, duration, listened_date, rating, cover_url) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-            [name, artist, genres, release_date, nr_tracks, duration, listened_date, rating, cover_url]
+        const { name, artist, genres, release_date, nr_tracks, duration, listened_date, rating, cover_url, review} = req.body;
+        const newEntry = await pool.query("INSERT INTO album (name, artist, genres, release_date, nr_tracks, duration, listened_date, rating, cover_url, review) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+            [name, artist, genres, release_date, nr_tracks, duration, listened_date, rating, cover_url, review]
         );
     } catch (err) {
         console.error(err.message);

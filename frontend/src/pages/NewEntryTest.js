@@ -38,6 +38,7 @@ export default function NewEntryTest() {
     const [listened_date, setListenedDate] = useState("");
     const [rating, setRating] = useState("");
     const [coverFile, setCoverFile] = useState(null);
+    const [review, setReview] = useState("");
 
     // Upload image to Supabase Storage
     const uploadCoverImage = async (file) => {
@@ -81,7 +82,7 @@ export default function NewEntryTest() {
             console.log("Uploaded image URL:", cover_url); // Debugging
             }
 
-            const body = {name, artist, genres, release_date, nr_tracks, duration, listened_date, rating, cover_url};
+            const body = {name, artist, genres, release_date, nr_tracks, duration, listened_date, rating, cover_url, review};
             console.log("Request body:", body);
 
             const response = await fetch("https://the-consoomer.onrender.com/new-entry", {
@@ -103,6 +104,7 @@ export default function NewEntryTest() {
                 setListenedDate("");
                 setRating("");
                 setCoverFile(null);
+                setReview("");
     
                 // Refresh the page if necessary
                 window.location.reload();
@@ -196,6 +198,13 @@ export default function NewEntryTest() {
                 type="file"
                 accept="image/*"
                 onChange={(e) => setCoverFile(e.target.files[0])}>
+            </input>
+            <p>Review:</p>
+            <input
+                className ="input input-bordered w-full max-w-xs"
+                type="text"
+                value={review}
+                onChange={e => setReview(e.target.value)}>
             </input>
             <br />
             <button className="btn btn-success">Add</button>

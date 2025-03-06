@@ -30,7 +30,7 @@ export default function AlbumDetails() {
 
   return (
     <div className="grid gap-2 grid-cols-1">
-      <div className="text-center block">
+      <div className="text-center">
         <p>
           <b>{album.name}</b> ({new Date(album.release_date).getFullYear()})
         </p>
@@ -59,6 +59,9 @@ export default function AlbumDetails() {
         </p>
         <p><strong>Rating:</strong> {album.rating}</p>
       </div>
+
+      <p className="text-center mt-5"><b>Thoughts</b></p>
+      <p>{album.review}</p>
     </div>
   );
 }
