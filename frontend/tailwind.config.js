@@ -7,13 +7,18 @@ module.exports = {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        loud: ['Vina Sans', 'sans-serif'],
+        artistic: ['Cinzel', 'serif'],
+      },
+    },
   },
   plugins: [
     daisyui,
   ],
   daisyui: {
-    themes: ["night"],
+    themes: ["lofi"],
   },
 }
 

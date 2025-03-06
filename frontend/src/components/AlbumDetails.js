@@ -29,39 +29,67 @@ export default function AlbumDetails() {
   if (!album) return <p>No album found.</p>;
 
   return (
-    <div className="grid gap-2 grid-cols-1">
-      <div className="text-center">
-        <p>
-          <b>{album.name}</b> ({new Date(album.release_date).getFullYear()})
-        </p>
-        <p>{album.artist}</p>
+    <div className="grid grid-cols-1">
+      <div className="text-center font-artistic">
+        <p className="text-[25px] -mb-2">{album.name}</p>
+        <p>by {album.artist}</p>
       </div>
+
       <img
         src={album.cover_url || "https://via.placeholder.com/300"}
         alt={album.name}
-        className="object-cover rounded-md"
+        className="p-5"
       />
-      <div>
-        <p><strong>Genres:</strong> {album.genres}</p>
-        <p><strong>Release Date:</strong> {new Date(album.release_date).toLocaleDateString("en-GB", {
+
+      <div className="grid grid-cols-2 mx-5">
+        <p>Released: </p>
+        <p>
+            {(() => {
+              const date = new Date(album.release_date).toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+              }).split(" "); // Split the date into parts
+
+              return (
+                <>
+                  {date.slice(0, -1).join(" ")}{" "}
+                  <b>{date[date.length - 1]}</b>
+                </>
+              );
+            })()}
+          </p>
+      </div>
+      <div className="grid grid-cols-2 mx-5">
+        <p>Genres:</p>
+        <p className="block">{album.genres}</p>
+      </div>
+      <div className="grid grid-cols-2 mx-5">
+        <p>Nr of Tracks:</p>
+        <p>{album.nr_tracks}</p>
+      </div>
+      <div className="grid grid-cols-2 mx-5">
+        <p>Duration:</p>
+        <p>{album.duration} mins</p>
+      </div>
+      <div className="grid grid-cols-2 mx-5">
+        <p>Listened:</p>
+        <p>{new Date(album.listened_date).toLocaleDateString("en-GB", {
           day: "numeric",
           month: "long",
           year: "numeric"
           })}
         </p>
-        <p><strong>Number of Tracks:</strong> {album.nr_tracks}</p>
-        <p><strong>Duration:</strong> {album.duration} mins</p>
-        <p><strong>Listened Date:</strong> {new Date(album.listened_date).toLocaleDateString("en-GB", {
-          day: "numeric",
-          month: "long",
-          year: "numeric"
-          })}
-        </p>
-        <p><strong>Rating:</strong> {album.rating}</p>
+      </div>
+      <div className="grid grid-cols-2 mx-5">
+        <p>Rating:</p>
+        <p>{album.rating}</p>
       </div>
 
-      <p className="text-center mt-5"><b>Thoughts</b></p>
-      <p>{album.review}</p>
+      <div className="border-b border-gray-300 my-10"></div>
+
+      <p className="mx-5">Thoughts:</p>
+      <p className="mx-5">{album.review}</p>
     </div>
   );
 }

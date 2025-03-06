@@ -118,14 +118,16 @@ export default function NewEntryTest() {
 
     if (!isAuthenticated) {
         return (
-            <div>
+            <div className='text-center'>
             <input
                 type="password"
                 value={password}
                 onChange={handlePasswordChange}
                 placeholder="Enter password"
+                className='input input-bordered w-full max-w-xs my-5'
             />
-            <button onClick={handleLogin}>Submit</button>
+            <br></br>
+            <button onClick={handleLogin} >Submit</button>
             </div>
         );
         }
@@ -133,7 +135,6 @@ export default function NewEntryTest() {
     return (
         <>
         <Navbar />
-        <p className="text-center">New Entry</p>
         <p>What type of media did u consume?</p>
         <form onSubmit={onSubmitForm}>
             <p>Name:</p>

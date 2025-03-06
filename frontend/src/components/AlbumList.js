@@ -30,7 +30,7 @@ export default function AlbumList() {
     const month = listenedDate.toLocaleString("default", { month: "long" }); // Get month name
 
     // Create a key for each year-month group
-    const groupKey = `${year} - ${month}`;
+    const groupKey = `${year} • ${month}`;
 
     // Add album to the corresponding group
     if (!groups[groupKey]) {
@@ -44,12 +44,12 @@ export default function AlbumList() {
   // Render the albums grouped by year and month
   return (
     <>
-      <p className="text-center text-[25px] mt-5 mb-5"><b>Consumed Albums</b></p>
+      <p className="text-center text-[25px] mt-5 mb-5 font-artistic font-[900] underline">Albums</p>
       <div className="overflow-x-auto">
         {Object.keys(groupedAlbums).map((groupKey) => (
           <div key={groupKey}>
-            <h2 className="text-xl font-bold mt-5 mb-5">{groupKey}</h2>
-            <div className="grid grid-cols-3 justify-around gap-2 sm:gap-5 sm:grid-cols-6">
+            <h2 className="ml-1 font-artistic">{groupKey}</h2>
+            <div className="grid grid-cols-3 sm:grid-cols-6 mb-5">
               {groupedAlbums[groupKey].map((album) => (
                 <div key={album.id} className="cursor-pointer">
                   <Link to={`/albums/${album.id}`}>
@@ -57,18 +57,12 @@ export default function AlbumList() {
                       <img
                         src={album.cover_url}
                         alt={album.name}
-                        className="aspect-square rounded-md"
+                        className="aspect-square p-1"
                       />
                     ) : (
                       "No Cover"
                     )}
                   </Link>
-                  <div className="text-center">
-                    <p>
-                      <b>{album.name}</b> ({new Date(album.release_date).getFullYear()})
-                    </p>
-                    <p>{album.artist}</p>
-                  </div>
                 </div>
               ))}
             </div>
