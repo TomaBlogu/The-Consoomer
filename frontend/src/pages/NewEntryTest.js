@@ -8,6 +8,26 @@ const supabase = createClient(
   );
 
 export default function NewEntryTest() {
+    const [password, setPassword] = useState("");
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    const handlePasswordChange = (e) => {
+        setPassword(e.target.value);
+      };
+
+    const handleLogin = async () => {
+        const response = await fetch('https://the-consoomer.onrender.com/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password }),
+        });
+
+        if (response.ok) {
+            setIsAuthenticated(true);
+        } else {
+            alert("Incorrect password");
+        }
+    };
 
     const [name, setName] = useState("");
     const [artist, setArtist] = useState("");
@@ -93,6 +113,20 @@ export default function NewEntryTest() {
             console.error('Error adding album:', err.message);
         }
     }
+
+    if (!isAuthenticated) {
+        return (
+            <div>
+            <input
+                type="password"
+                value={password}
+                onChange={handlePasswordChange}
+                placeholder="Enter password"
+            />
+            <button onClick={handleLogin}>Submit</button>
+            </div>
+        );
+        }
 
     return (
         <>

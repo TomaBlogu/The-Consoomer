@@ -21,7 +21,7 @@ export default function AlbumList() {
   return (
     <>
     <div className="overflow-x-auto mt-10">
-      <div className="grid grid-cols-6 justify-around gap-5">
+      <div className="grid grid-cols-3 justify-around gap-2 sm:gap-5 sm:grid-cols-6">
         {albums.map((album) => (
           <div key={album.id} className="cursor-pointer">
             <Link to={`/albums/${album.id}`}>
@@ -29,20 +29,16 @@ export default function AlbumList() {
                 <img
                   src={album.cover_url}
                   alt={album.name}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    maxHeight: "300px",
-                    maxWidth: "300px",
-                    objectFit: "cover",
-                    borderRadius: "5px",
-                  }}
+                  className="aspect-square"
                 />
               ) : (
                 "No Cover"
               )}
             </Link>
-            <h2 className="text-xl font-bold text-center">{album.name} - {album.artist}</h2>
+            <div className="text-center">
+              <p><b>{album.name}</b> ({new Date(album.release_date).getFullYear()})</p>
+              <p>{album.artist}</p>
+            </div>
           </div>
         ))}
       </div>

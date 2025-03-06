@@ -19,6 +19,16 @@ app.post("/new-entry", async (req, res) => {
     }
 })
 
+const password = process.env.REACT_APP_PASSWORD;
+app.post('/login', (req, res) => {
+    const { password } = req.body;
+    if (password === process.env.REACT_APP_PASSWORD) {
+        res.status(200).json({ success: true });
+    } else {
+        res.status(401).json({ success: false });
+    }
+});
+
 app.get("/albums", async(req, res) => {
     try {
         const allTest = await pool.query("SELECT * FROM album");
