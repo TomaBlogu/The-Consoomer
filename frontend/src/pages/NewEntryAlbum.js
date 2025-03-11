@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 
-export default function NewEntryTest() {
+export default function NewEntryAlbum() {
     const [password, setPassword] = useState("");
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -9,7 +9,7 @@ export default function NewEntryTest() {
       };
 
     const handleLogin = async () => {
-        const response = await fetch('https://the-consoomer.onrender.com/login', {
+        const response = await fetch('http://localhost:5000/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ password }),
@@ -37,7 +37,7 @@ export default function NewEntryTest() {
             const body = {name, artist, genres, listened_date, rating, review};
             console.log("Request body:", body);
 
-            const response = await fetch("https://the-consoomer.onrender.com/new-entry", {
+            const response = await fetch("http://localhost:5000/new-entry-album", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(body)
@@ -82,7 +82,6 @@ export default function NewEntryTest() {
 
     return (
         <>
-        <p>What type of media did u consume?</p>
         <form onSubmit={onSubmitForm}>
             <p>Name:</p>
             <input 

@@ -16,7 +16,7 @@ export default function AlbumDetails() {
   useEffect(() => {
     const fetchAlbum = async () => {
       try {
-        const response = await fetch(`https://the-consoomer.onrender.com/albums/${id}`);
+        const response = await fetch(`http://localhost:5000/albums/${id}`);
         if (!response.ok) throw new Error("Album not found");
         const data = await response.json();
         setAlbum(data);
@@ -29,9 +29,9 @@ export default function AlbumDetails() {
   }, [id]);
 
   // Function to fetch album cover and details from iTunes API
-  const fetchAlbumDetails = async (albumName, artist) => {
-    const query = `${artist} ${albumName}`;
-    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=album&limit=1`;
+  const fetchAlbumDetails = async (album, artist) => {
+    const query = `${artist} ${album}`;
+    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=album&limit=5`;
 
     try {
       const response = await fetch(url);
@@ -39,20 +39,25 @@ export default function AlbumDetails() {
       console.log('iTunes API Response:', data); // Debug log
 
       // Check if results exist and ensure correct format
-      if (data.results && data.results.length > 0) {
-        const albumData = data.results[0];
+      if (data.resultCount > 0) {
+        const matchedAlbum = data.results.find((result) =>
+          result.collectionName.toLowerCase() === album.toLowerCase()
+        );
 
-        // Get highest quality artwork
-        const artworkUrl = albumData.artworkUrl100?.replace("100x100", "1000x1000");
-        setAlbumCover(artworkUrl || "https://via.placeholder.com/300");
+        if (matchedAlbum) {
+          const artworkUrl = matchedAlbum.artworkUrl100.replace("100x100", "1000x1000");
+          setAlbumCover(artworkUrl);
+        } else {
+          setAlbumCover(null);
+        }
 
         // Extract additional details
-        const releaseDate = albumData.releaseDate ? new Date(albumData.releaseDate) : null;
-        const genres = albumData.primaryGenreName || null;
-        const nrTracks = albumData.trackCount || null;
+        const releaseDate = matchedAlbum.releaseDate ? new Date(matchedAlbum.releaseDate) : null;
+        const genres = matchedAlbum.primaryGenreName || null;
+        const nrTracks = matchedAlbum.trackCount || null;
 
         // Fetch tracks to calculate the total duration
-        await fetchAlbumTracks(albumData.collectionId);
+        await fetchAlbumTracks(matchedAlbum.collectionId);
 
         setAlbumDetails({
           releaseDate,
@@ -162,11 +167,19 @@ export default function AlbumDetails() {
       <div className="grid grid-cols-2 mx-5">
         <p>Released: </p>
         <p>
-          {albumDetails.releaseDate ? new Date(albumDetails.releaseDate).toLocaleDateString("en-GB", {
+        {(() => {
+          const date = new Date(albumDetails.releaseDate).toLocaleDateString("en-GB", {
             day: "numeric",
             month: "long",
-            year: "numeric"
-          }) : "N/A"}
+            year: "numeric",
+          });
+          const parts = date.split(" "); // Splitting the formatted date into parts
+          return (
+            <>
+              {parts.slice(0, -1).join(" ")} <strong>{parts[parts.length - 1]}</strong>
+            </>
+          );
+        })()}
         </p>
       </div>
       <div className="grid grid-cols-2 mx-5">

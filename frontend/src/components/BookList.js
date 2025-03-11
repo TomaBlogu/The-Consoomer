@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-export default function AlbumList() {
+export default function BookList() {
   const [albums, setAlbums] = useState([]);
   const [albumCovers, setAlbumCovers] = useState({}); // Store fetched covers
 
   useEffect(() => {
     const fetchAlbums = async () => {
       try {
-        const response = await fetch("http://localhost:5000/albums");
+        const response = await fetch("http://localhost:5000/books");
         const data = await response.json();
         setAlbums(data.rows);
       } catch (error) {
@@ -22,23 +22,14 @@ export default function AlbumList() {
   // Function to fetch album cover from iTunes API
   const fetchAlbumCover = async (album, artist) => {
     const query = `${artist} ${album}`;
-    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=album&limit=5`;
-  
+    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=album&limit=1`;
+
     try {
       const response = await fetch(url);
       const data = await response.json();
-  
       if (data.resultCount > 0) {
-        const matchedAlbum = data.results.find((result) =>
-          result.collectionName.toLowerCase() === album.toLowerCase()
-        );        
-  
-        if (matchedAlbum) {
-          const artworkUrl = matchedAlbum.artworkUrl100.replace("100x100", "1000x1000");
-          setAlbumCovers((prev) => ({ ...prev, [`${album}-${artist}`]: artworkUrl }));
-        } else {
-          setAlbumCovers((prev) => ({ ...prev, [`${album}-${artist}`]: null }));
-        }
+        const artworkUrl = data.results[0].artworkUrl100.replace("100x100", "1000x1000"); // Get highest quality
+        setAlbumCovers((prev) => ({ ...prev, [`${album}-${artist}`]: artworkUrl }));
       } else {
         setAlbumCovers((prev) => ({ ...prev, [`${album}-${artist}`]: null }));
       }
@@ -46,7 +37,7 @@ export default function AlbumList() {
       console.error(`Error fetching cover for ${album} by ${artist}:`, error);
       setAlbumCovers((prev) => ({ ...prev, [`${album}-${artist}`]: null }));
     }
-  };  
+  };
 
   useEffect(() => {
     albums.forEach((album) => {

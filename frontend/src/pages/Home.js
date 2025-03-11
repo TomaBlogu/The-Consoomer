@@ -1,18 +1,18 @@
 import Navbar from "../components/Navbar";
 import { motion } from "framer-motion";
 
-export default function Films() {
+export default function Home() {
   return (
     <div>
       <Navbar />
       <ul className="text-center list-none text-[25px] mt-5 mb-5 font-artistic font-[900]">
         {[
           { name: "Albums", path: "/albums" },
-          { name: "Books", path: "/books" },
           { name: "Films", path: "/films" },
+          { name: "Books", path: "/books" },
           { name: "Series", path: "/series" },
           { name: "Anime", path: "/anime" },
-          { name: "2025 Bingo", path: "/bingo" },
+          { name: "2025 Bingo", path: "/2025-bingo" },
         ].map((item, index) => (
           <motion.li
             key={index}
@@ -40,11 +40,6 @@ export default function Films() {
           </motion.li>
         ))}
         <br />
-        <li>
-          <a href="/new-entry" className="font-light text-[15px]">
-            +new entry
-          </a>
-        </li>
       </ul>
     </div>
   );

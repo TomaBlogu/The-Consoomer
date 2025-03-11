@@ -8,11 +8,33 @@ app.use(express.json());
 
 //Routes
 
-app.post("/new-entry", async (req, res) => {
+app.post("/new-entry-album", async (req, res) => {
     try {
         const { name, artist, genres, listened_date, rating, review} = req.body;
         const newEntry = await pool.query("INSERT INTO album (name, artist, genres, listened_date, rating, review) VALUES($1, $2, $3, $4, $5, $6)",
             [name, artist, genres, listened_date, rating, review]
+        );
+    } catch (err) {
+        console.error(err.message);
+    }
+})
+
+app.post("/new-entry-film", async (req, res) => {
+    try {
+        const { name, director, genres, watched_date, rating, review} = req.body;
+        const newEntry = await pool.query("INSERT INTO film (name, director, genres, watched_date, rating, review) VALUES($1, $2, $3, $4, $5, $6)",
+            [name, director, genres, watched_date, rating, review]
+        );
+    } catch (err) {
+        console.error(err.message);
+    }
+})
+
+app.post("/new-entry-book", async (req, res) => {
+    try {
+        const { name, author, genres, read_date, rating, review} = req.body;
+        const newEntry = await pool.query("INSERT INTO book (name, author, genres, read_date, rating, review) VALUES($1, $2, $3, $4, $5, $6)",
+            [name, author, genres, read_date, rating, review]
         );
     } catch (err) {
         console.error(err.message);
@@ -38,6 +60,24 @@ app.get("/albums", async(req, res) => {
     }
 })
 
+app.get("/films", async(req, res) => {
+    try {
+        const allTest = await pool.query("SELECT * FROM film");
+        res.json(allTest);
+    } catch (err) {
+        console.error(err.message);
+    }
+})
+
+app.get("/books", async(req, res) => {
+    try {
+        const allTest = await pool.query("SELECT * FROM book");
+        res.json(allTest);
+    } catch (err) {
+        console.error(err.message);
+    }
+})
+
 app.get("/albums/:id", async (req, res) => {
     try {
         const { id } = req.params;
@@ -48,6 +88,38 @@ app.get("/albums/:id", async (req, res) => {
         }
 
         res.json(album.rows[0]);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server error");
+    }
+});
+
+app.get("/films/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const film = await pool.query("SELECT * FROM film WHERE id = $1", [id]);
+        
+        if (film.rows.length === 0) {
+            return res.status(404).json({ message: "Film not found" });
+        }
+
+        res.json(film.rows[0]);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server error");
+    }
+});
+
+app.get("/books/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const book = await pool.query("SELECT * FROM book WHERE id = $1", [id]);
+        
+        if (book.rows.length === 0) {
+            return res.status(404).json({ message: "Book not found" });
+        }
+
+        res.json(book.rows[0]);
     } catch (err) {
         console.error(err.message);
         res.status(500).send("Server error");

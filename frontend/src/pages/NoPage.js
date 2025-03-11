@@ -1,4 +1,4 @@
-export default function Films() {
+export default function NoPage() {
   return (
     <div>
       <p className="text-center">Page doesn't exist</p>
