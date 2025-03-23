@@ -10,9 +10,6 @@ export default function Home() {
           { name: "Albums", path: "/albums" },
           { name: "Films", path: "/films" },
           { name: "Books", path: "/books" },
-          { name: "Series", path: "/series" },
-          { name: "Anime", path: "/anime" },
-          { name: "2025 Bingo", path: "/2025-bingo" },
         ].map((item, index) => (
           <motion.li
             key={index}

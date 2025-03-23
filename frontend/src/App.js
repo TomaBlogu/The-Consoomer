@@ -9,7 +9,7 @@ import NewEntryBook from './pages/NewEntryBook';
 import NewEntryFilm from './pages/NewEntryFilm';
 import AlbumDetails from "./pages/AlbumDetails";
 import FilmDetails from "./pages/FilmDetails";
-import Book from "./pages/Book";
+import BookDetails from "./pages/BookDetails";
 import Bingo from './pages/Bingo';
 import './styles/App.css';
 
@@ -25,7 +25,7 @@ export default function App() {
           <Route path="/films" element={<Films />} />
           <Route path="/films/:id" element={<FilmDetails />} />
           <Route path="/books" element={<Books />} />
-          <Route path="/books/:id" element={<Book />} />
+          <Route path="/books/:id" element={<BookDetails />} />
           <Route path="/new-entry-album" element={<NewEntryAlbum />} />
           <Route path="/new-entry-film" element={<NewEntryFilm />} />
           <Route path="/new-entry-book" element={<NewEntryBook />} />
