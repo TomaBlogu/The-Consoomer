@@ -9,7 +9,7 @@ export default function NewEntryFilm() {
       };
 
     const handleLogin = async () => {
-        const response = await fetch('http://localhost:5000/login', {
+        const response = await fetch('https://the-consoomer-backend.onrender.com/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ password }),
@@ -37,7 +37,7 @@ export default function NewEntryFilm() {
             const body = {name, director, genres, watched_date, rating, review};
             console.log("Request body:", body);
 
-            const response = await fetch("http://localhost:5000/new-entry-film", {
+            const response = await fetch("https://the-consoomer-backend.onrender.com/new-entry-film", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(body)

@@ -2,140 +2,143 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 export default function AlbumDetails() {
-  const { id } = useParams(); // Get album id from URL
+  const { id } = useParams();
   const [album, setAlbum] = useState(null);
-  const [albumCover, setAlbumCover] = useState(null); // Store the fetched cover
+  const [albumCover, setAlbumCover] = useState(null);
   const [albumDetails, setAlbumDetails] = useState({
     releaseDate: null,
-    genres: null,
     nrTracks: null,
-  }); // Store additional album details excluding duration
-  const [duration, setDuration] = useState(null); // Separate duration state
+  });
+  const [duration, setDuration] = useState(null);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchAlbum = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/albums/${id}`);
+        setLoading(true);
+        const response = await fetch(`https://the-consoomer-backend.onrender.com/albums/${id}`);
         if (!response.ok) throw new Error("Album not found");
         const data = await response.json();
         setAlbum(data);
+
+        setAlbumDetails({
+          releaseDate: data.release_date || null,
+          nrTracks: data.nr_tracks || null,
+        });
+
+        if (data.duration && !isNaN(parseInt(data.duration, 10))) {
+          const totalSeconds = parseInt(data.duration, 10);
+          setDuration(totalSeconds);
+        } else {
+          setDuration(null);
+        }
+
+        if (data.cover_url) {
+          setAlbumCover(data.cover_url);
+        } else {
+          fetchAlbumCoverFromLastFm(data.name, data.artist);
+        }
       } catch (err) {
         setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchAlbum();
   }, [id]);
 
-  // Function to fetch album cover and details from iTunes API
-  const fetchAlbumDetails = async (album, artist) => {
-    const query = `${artist} ${album}`;
-    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=album&limit=5`;
+  const fetchAlbumCoverFromLastFm = async (album, artist) => {
+    const apiKey = "d10adc92abe0cdb5e3b1458b7d506f6c"; // Replace with your Last.fm API key
+    const url = `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${apiKey}&artist=${encodeURIComponent(
+      artist
+    )}&album=${encodeURIComponent(album)}&format=json`;
 
     try {
       const response = await fetch(url);
       const data = await response.json();
-      console.log('iTunes API Response:', data); // Debug log
 
-      // Check if results exist and ensure correct format
-      if (data.resultCount > 0) {
-        const matchedAlbum = data.results.find((result) =>
-          result.collectionName.toLowerCase() === album.toLowerCase()
-        );
-
-        if (matchedAlbum) {
-          const artworkUrl = matchedAlbum.artworkUrl100.replace("100x100", "1000x1000");
-          setAlbumCover(artworkUrl);
-        } else {
-          setAlbumCover(null);
-        }
-
-        // Extract additional details
-        const releaseDate = matchedAlbum.releaseDate ? new Date(matchedAlbum.releaseDate) : null;
-        const genres = matchedAlbum.primaryGenreName || null;
-        const nrTracks = matchedAlbum.trackCount || null;
-
-        // Fetch tracks to calculate the total duration
-        await fetchAlbumTracks(matchedAlbum.collectionId);
-
-        setAlbumDetails({
-          releaseDate,
-          genres,
-          nrTracks,
-        });
+      if (data.album) {
+        const artworkUrl = data.album.image.find((img) => img.size === "extralarge")?.["#text"];
+        setAlbumCover(artworkUrl || null);
       } else {
+        console.warn(`No album cover found for ${album} by ${artist}`);
         setAlbumCover(null);
-        setAlbumDetails({
-          releaseDate: null,
-          genres: null,
-          nrTracks: null,
-        });
       }
     } catch (error) {
-      console.error(`Error fetching album details:`, error);
-      setError("Error fetching album details");
-      setAlbumDetails({
-        releaseDate: null,
-        genres: null,
-        nrTracks: null,
-      });
+      console.error(`Error fetching album cover for ${album} by ${artist}:`, error);
+      setAlbumCover(null);
     }
   };
 
-  // Function to fetch album tracks and calculate total duration
-  const fetchAlbumTracks = async (collectionId) => {
-    const url = `https://itunes.apple.com/lookup?id=${collectionId}&entity=song`;
+  const fetchAlbumDetailsFromiTunes = async (album, artist) => {
+    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(
+      artist + " " + album
+    )}&entity=album&limit=50`;
 
     try {
-      console.log('Fetching album tracks...'); // Debug log
       const response = await fetch(url);
-      console.log('Response:', response); // Log the response object
-
       const data = await response.json();
-      console.log('iTunes API Response:', data); // Log the parsed JSON response
 
-      // Ensure there are results in the response
-      if (data.results && data.results.length > 1) { // Skip the first result (album metadata)
-        console.log('Track data:', data.results.slice(1)); // Log the track data
+      if (data.results && data.results.length > 0) {
+        // Refine search to match the exact album and artist
+        const matchedAlbum = data.results.find(
+          (result) =>
+            result.collectionName.toLowerCase() === album.toLowerCase() &&
+            result.artistName.toLowerCase() === artist.toLowerCase()
+        );
 
-        // Sum the track durations (in milliseconds)
-        const totalDurationMs = data.results.slice(1).reduce((sum, track) => {
-          console.log('Track:', track.trackName, 'Duration (ms):', track.trackTimeMillis); // Log each track's name and duration
-          return sum + track.trackTimeMillis;
-        }, 0);
+        if (matchedAlbum) {
+          // Validate the matched album further by checking release date and track count
+          const releaseDate = matchedAlbum.releaseDate
+            ? new Date(matchedAlbum.releaseDate)
+            : null;
+          const nrTracks = matchedAlbum.trackCount || "N/A";
 
-        console.log('Total duration in ms:', totalDurationMs); // Log total duration in ms
+          // If the matched album passes validation, update the details
+          setAlbumDetails((prevDetails) => ({
+            releaseDate: prevDetails.releaseDate || releaseDate,
+            nrTracks: prevDetails.nrTracks || nrTracks,
+          }));
 
-        // Convert milliseconds to minutes and seconds
-        const totalDurationSecs = totalDurationMs / 1000;
-        const minutes = Math.floor(totalDurationSecs / 60);
-        const seconds = Math.round(totalDurationSecs % 60);
-        console.log('Formatted duration:', `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`); // Log the formatted duration
+          // Fetch tracks to calculate duration
+          const tracksUrl = `https://itunes.apple.com/lookup?id=${matchedAlbum.collectionId}&entity=song`;
+          const tracksResponse = await fetch(tracksUrl);
+          const tracksData = await tracksResponse.json();
 
-        // Update the separate duration state with the calculated duration
-        setDuration(`${minutes}:${seconds < 10 ? '0' + seconds : seconds}`);
+          if (tracksData.results && tracksData.results.length > 1) {
+            const totalDurationMs = tracksData.results
+              .slice(1) // Skip the first result, which is the album itself
+              .reduce((sum, track) => sum + (track.trackTimeMillis || 0), 0);
+
+            if (totalDurationMs > 0) {
+              const totalSeconds = Math.floor(totalDurationMs / 1000);
+              setDuration(totalSeconds);
+            } else {
+              setDuration(null);
+            }
+          }
+        } else {
+          console.warn(`No exact match found for ${album} by ${artist} on iTunes`);
+        }
       } else {
-        console.log('No tracks found or invalid response'); // Log if no tracks are found
-        setDuration("No tracks found");
+        console.warn(`No albums found for ${album} by ${artist} on iTunes`);
       }
     } catch (error) {
-      console.error('Error fetching album tracks:', error); // Log any error
-      setDuration("Error fetching duration");
+      console.error(`Error fetching album details for ${album} by ${artist} from iTunes:`, error);
     }
   };
 
   useEffect(() => {
     if (album) {
-      fetchAlbumDetails(album.name, album.artist);
+      if (!album.release_date || !album.nr_tracks || !album.duration) {
+        fetchAlbumDetailsFromiTunes(album.name, album.artist);
+      }
     }
   }, [album]);
 
-  // Log album details for debugging
-  useEffect(() => {
-    console.log("Album details:", albumDetails); // Debug log
-  }, [albumDetails]);
-
+  if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
   if (!album) return <p>No album found.</p>;
 
@@ -158,33 +161,29 @@ export default function AlbumDetails() {
         <p>by {album.artist}</p>
       </div>
 
-      <img
-        src={albumCover}
-        alt={album.name}
-        className="p-5 mx-auto"
-      />
+      {albumCover && (
+        <img
+          src={albumCover}
+          alt={album.name}
+          className="p-5 mx-auto w-[300px] h-[300px] object-cover"
+        />
+      )}
 
       <div className="grid grid-cols-2 mx-5">
-        <p>Released: </p>
+        <p>Released:</p>
         <p>
-        {(() => {
-          const date = new Date(albumDetails.releaseDate).toLocaleDateString("en-GB", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          });
-          const parts = date.split(" "); // Splitting the formatted date into parts
-          return (
-            <>
-              {parts.slice(0, -1).join(" ")} <strong>{parts[parts.length - 1]}</strong>
-            </>
-          );
-        })()}
+          {albumDetails.releaseDate
+            ? new Date(albumDetails.releaseDate).toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })
+            : "N/A"}
         </p>
       </div>
       <div className="grid grid-cols-2 mx-5">
         <p>Genres:</p>
-        <p>{albumDetails.genres || "N/A"}</p>
+        <p>{album.genres || "N/A"}</p>
       </div>
       <div className="grid grid-cols-2 mx-5">
         <p>Nr of Tracks:</p>
@@ -192,22 +191,38 @@ export default function AlbumDetails() {
       </div>
       <div className="grid grid-cols-2 mx-5">
         <p>Duration:</p>
-        <p>{duration || "N/A"}</p>
+        <p>
+          {duration !== null
+            ? (() => {
+                const minutes = Math.floor(duration / 60);
+                const seconds = duration % 60;
+                return `${minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
+              })()
+            : "N/A"}
+        </p>
       </div>
       <div className="grid grid-cols-2 mx-5">
         <p>Listened:</p>
-        <p>{new Date(album.listened_date).toLocaleDateString("en-GB", {
-          day: "numeric",
-          month: "long",
-          year: "numeric"
-        })}</p>
+        <p>
+          {album.listened_date
+            ? new Date(album.listened_date).toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })
+            : "N/A"}
+        </p>
       </div>
-      <div className="grid grid-cols-2 mx-5" style={{ backgroundColor: getRatingColor(album.rating) }}>
+      
+      <div
+        className="grid grid-cols-2 mx-5"
+        style={{ backgroundColor: getRatingColor(album.rating) }}
+      >
         <p>Rating:</p>
         <p>{album.rating}</p>
       </div>
 
-      <div className="border-b border-gray-300 my-10 "></div>
+      <div className="border-b border-gray-300 my-10"></div>
 
       <p className="mx-5">Thoughts:</p>
       <p className="mx-5">{album.review}</p>

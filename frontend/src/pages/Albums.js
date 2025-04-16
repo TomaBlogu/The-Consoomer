@@ -6,7 +6,7 @@ export default function Albums() {
     <div>
       <Navbar />
       <p className="text-center text-[25px] mt-5 font-artistic font-[900] underline">Albums</p>
-      <li className='list-none text-center mb-5'>
+      <li className='list-none text-center mb-2'>
         <a href="/new-entry-album" className="text-[20px] ml-1 font-artistic">
           +
         </a>

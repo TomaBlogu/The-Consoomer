@@ -9,7 +9,7 @@ export default function NewEntryAlbum() {
       };
 
     const handleLogin = async () => {
-        const response = await fetch('http://localhost:5000/login', {
+        const response = await fetch('https://the-consoomer-backend.onrender.com/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ password }),
@@ -24,7 +24,6 @@ export default function NewEntryAlbum() {
 
     const [name, setName] = useState("");
     const [artist, setArtist] = useState("");
-    const [genres, setGenres] = useState("");
     const [listened_date, setListenedDate] = useState("");
     const [rating, setRating] = useState("");
     const [review, setReview] = useState("");
@@ -34,10 +33,10 @@ export default function NewEntryAlbum() {
 
         try {
 
-            const body = {name, artist, genres, listened_date, rating, review};
+            const body = {name, artist, listened_date, rating, review};
             console.log("Request body:", body);
 
-            const response = await fetch("http://localhost:5000/new-entry-album", {
+            const response = await fetch("https://the-consoomer-backend.onrender.com/new-entry-album", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(body)
@@ -49,7 +48,6 @@ export default function NewEntryAlbum() {
             if (response.ok) {
                 setName("");
                 setArtist("");
-                setGenres("");
                 setListenedDate("");
                 setRating("");
                 setReview("");
@@ -96,13 +94,6 @@ export default function NewEntryAlbum() {
                 type="text"
                 value={artist}
                 onChange={e => setArtist(e.target.value)}>
-            </input>
-            <p>Genres:</p>
-            <input
-                className ="input input-bordered w-full max-w-xs"
-                type="text"
-                value={genres}
-                onChange={e => setGenres(e.target.value)}>
             </input>
             <p>Listened date:</p>
             <input

@@ -11,7 +11,7 @@ export default function FilmDetails() {
   useEffect(() => {
     const fetchFilm = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/films/${id}`);
+        const response = await fetch(`https://the-consoomer-backend.onrender.com/films/${id}`);
         if (!response.ok) throw new Error("Film not found");
         const data = await response.json();
         setFilm(data);
@@ -63,7 +63,9 @@ export default function FilmDetails() {
           title: matchedMovie.title,
           posterPath: matchedMovie.poster_path,
           releaseDate: matchedMovie.release_date,
-          duration: matchedMovie.runtime,
+          duration: matchedMovie.runtime
+            ? `${Math.floor(matchedMovie.runtime / 60)} h ${matchedMovie.runtime % 60} m`
+            : "N/A",
           genres: matchedMovie.genres.map((g) => g.name).join(", ") || "N/A",
         });
       } catch (err) {
@@ -74,11 +76,17 @@ export default function FilmDetails() {
     fetchFilm();
   }, [id]);
 
-  function getRatingColor(rating) {
-    if (rating >= 8) return "text-green-500";
-    if (rating >= 5) return "text-yellow-500";
-    return "text-red-500";
-  }
+  const getRatingColor = (rating) => {
+    if (rating <= 5) {
+      const red = 255;
+      const green = Math.round((rating / 5) * 255);
+      return `rgba(${red}, ${green}, 0, 0.3)`;
+    } else {
+      const red = Math.round((1 - (rating - 5) / 5) * 255);
+      const green = 255;
+      return `rgba(${red}, ${green}, 0, 0.3)`;
+    }
+  };
 
   if (error) return <p>{error}</p>;
   if (!film) return <p>No film found.</p>;
@@ -119,7 +127,7 @@ export default function FilmDetails() {
 
       <div className="grid grid-cols-2 mx-5">
         <p>Duration:</p>
-        <p>{selectedMovie.duration ? `${selectedMovie.duration} minutes` : "N/A"}</p>
+        <p>{selectedMovie.duration ? `${selectedMovie.duration}` : "N/A"}</p>
       </div>
 
       <div className="grid grid-cols-2 mx-5">
@@ -133,9 +141,12 @@ export default function FilmDetails() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 mx-5">
+      <div 
+        className="grid grid-cols-2 mx-5"
+        style={{ backgroundColor: getRatingColor(film.rating) }}
+      >
         <p>Rating:</p>
-        <p className={getRatingColor(film.rating)}>{film.rating}</p>
+        <p>{film.rating}</p>
       </div>
 
       <div className="border-b border-gray-300 my-10"></div>

@@ -1,6 +1,19 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
+// Updated the rating color logic to match AlbumDetails
+const getRatingColor = (rating) => {
+  if (rating <= 5) {
+    const red = 255;
+    const green = Math.round((rating / 5) * 255);
+    return `rgba(${red}, ${green}, 0, 0.3)`;
+  } else {
+    const red = Math.round((1 - (rating - 5) / 5) * 255);
+    const green = 255;
+    return `rgba(${red}, ${green}, 0, 0.3)`;
+  }
+};
+
 export default function BookDetails() {
   const { id } = useParams();
   const [book, setBook] = useState(null);
@@ -10,12 +23,17 @@ export default function BookDetails() {
   useEffect(() => {
     const fetchBook = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/books/${id}`);
+        const response = await fetch(`https://the-consoomer-backend.onrender.com/books/${id}`);
         if (!response.ok) throw new Error("Book not found");
         const data = await response.json();
         setBook(data);
 
         console.log("Fetched Book Data:", data);
+
+        // Ensure genres are fetched and displayed
+        if (!data.genres || data.genres.length === 0) {
+          console.warn("Genres not found in API response");
+        }
 
         // Use cover_url from database if available
         if (data.cover_url) {
@@ -73,7 +91,7 @@ export default function BookDetails() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 mx-5">
+      <div className="grid grid-cols-2 mx-5" style={{ backgroundColor: getRatingColor(book.rating) }}>
         <p>Rating:</p>
         <p>{book.rating}</p>
       </div>

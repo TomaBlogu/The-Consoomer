@@ -3,16 +3,17 @@ const cors = require("cors");
 const pool = require("./database");
 
 const app = express();
+
 app.use(cors());
+
 app.use(express.json());
 
 //Routes
-
 app.post("/new-entry-album", async (req, res) => {
     try {
-        const { name, artist, genres, listened_date, rating, review} = req.body;
-        const newEntry = await pool.query("INSERT INTO album (name, artist, genres, listened_date, rating, review) VALUES($1, $2, $3, $4, $5, $6)",
-            [name, artist, genres, listened_date, rating, review]
+        const { name, artist, listened_date, rating, review} = req.body;
+        const newEntry = await pool.query("INSERT INTO album (name, artist, listened_date, rating, review) VALUES($1, $2, $3, $4, $5)",
+            [name, artist, listened_date, rating, review]
         );
     } catch (err) {
         console.error(err.message);

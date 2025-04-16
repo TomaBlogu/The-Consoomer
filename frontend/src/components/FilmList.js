@@ -6,12 +6,13 @@ export default function FilmList() {
   const [sortOption, setSortOption] = useState("date"); // Sorting option: "date", "ratingHigh", "ratingLow", "releaseYear", "releaseYearDesc"
   const [searchQuery, setSearchQuery] = useState(""); // Search query
   const [releaseYears, setReleaseYears] = useState({}); // Store fetched release years
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State to toggle dropdown visibility
   const tmdbApiKey = process.env.REACT_APP_TMDB_API_KEY;
 
   useEffect(() => {
     const fetchFilms = async () => {
       try {
-        const response = await fetch("http://localhost:5000/films");
+        const response = await fetch("https://the-consoomer-backend.onrender.com/films");
         const data = await response.json();
         console.log("🎥 Films fetched from database:", data.rows);
 
@@ -134,25 +135,73 @@ export default function FilmList() {
 
   return (
     <div className="overflow-x-auto">
-      <div className="flex justify-between mb-4">
+      <div className="flex justify-between mb-5 mx-1">
         <input
           type="text"
           placeholder="Search by film or director..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="px-4 py-2 rounded bg-gray-200 text-black w-1/2"
+          className="px-4 bg-gray-200 flex-grow mr-1"
         />
-        <select
-          value={sortOption}
-          onChange={(e) => setSortOption(e.target.value)}
-          className="px-4 py-2 rounded bg-gray-200 text-black"
-        >
-          <option value="date">Sort by Date</option>
-          <option value="ratingHigh">Rating: High to Low</option>
-          <option value="ratingLow">Rating: Low to High</option>
-          <option value="releaseYear">Release Year: Oldest to Newest</option>
-          <option value="releaseYearDesc">Release Year: Newest to Oldest</option>
-        </select>
+        <div className="relative">
+          <img
+            src="/sort.png"
+            alt="Sort"
+            className="cursor-pointer w-10"
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          />
+          {isDropdownOpen && (
+            <div className="absolute right-0 mt-2 bg-gray-200 shadow-lg w-48">
+              <ul className="w-full">
+                <li
+                  className="px-4 py-2 cursor-pointer hover:bg-gray-300"
+                  onClick={() => {
+                    setSortOption("date");
+                    setIsDropdownOpen(false);
+                  }}
+                >
+                  Recently Watched
+                </li>
+                <li
+                  className="px-4 py-2 cursor-pointer hover:bg-gray-300"
+                  onClick={() => {
+                    setSortOption("ratingHigh");
+                    setIsDropdownOpen(false);
+                  }}
+                >
+                  Rating: High to Low
+                </li>
+                <li
+                  className="px-4 py-2 cursor-pointer hover:bg-gray-300"
+                  onClick={() => {
+                    setSortOption("ratingLow");
+                    setIsDropdownOpen(false);
+                  }}
+                >
+                  Rating: Low to High
+                </li>
+                <li
+                  className="px-4 py-2 cursor-pointer hover:bg-gray-300"
+                  onClick={() => {
+                    setSortOption("releaseYear");
+                    setIsDropdownOpen(false);
+                  }}
+                >
+                  Release: Oldest to Newest
+                </li>
+                <li
+                  className="px-4 py-2 cursor-pointer hover:bg-gray-300"
+                  onClick={() => {
+                    setSortOption("releaseYearDesc");
+                    setIsDropdownOpen(false);
+                  }}
+                >
+                  Release: Newest to Oldest
+                </li>
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
       {Object.keys(groupedFilms).map((groupKey) => (
         <div key={groupKey}>
